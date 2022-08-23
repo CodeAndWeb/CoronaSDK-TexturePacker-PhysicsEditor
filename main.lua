@@ -3,50 +3,54 @@
 -- Demonstrates complex body construction by generating 100 random physics objects
 --
 -- This demo loads physics bodies created with http://www.physicseditor.de
---
--- Code is based on ANSCA's Create demo
--- Sample code is MIT licensed, see http://developer.anscamobile.com/code/license
--- Copyright (C) 2010 ANSCA Inc. All Rights Reserved.
+
 
 local physics = require("physics")
 physics.start()
 display.setStatusBar( display.HiddenStatusBar )
 
--- load spritegrabber
-local grabber = require("SpriteGrabber")
-spriteSheet = grabber.grabSheet("spritesheet")
+-- Load the TexturePacker generated image sheet.
+local sheetInfo = require("spritesheet")
+local myImageSheet = graphics.newImageSheet(
+    "spritesheet.png", sheetInfo:getSheet()
+)
 
--- background shape
-local bkg = spriteSheet:grabSprite( "bkg_cor.png", true)
+-- add background to the center of the screen
+local bkg = display.newImage( myImageSheet , sheetInfo:getFrameIndex("bkg_cor") )
+bkg.x = display.contentCenterX
+bkg.y = display.contentCenterY
 
--- create physical floor shape
-local bar = spriteSheet:grabSprite("bar.png", true)
-bar.x = 160; bar.y = 430
+-- create physical floor shape to the bottom of the screen
+local bar = display.newImage( myImageSheet , sheetInfo:getFrameIndex("bar") )
+bar.x = display.contentCenterX
+bar.y = display.contentHeight - display.screenOriginY - 56
 physics.addBody( bar, "static", { friction=0.5, bounce=0.3 } )
 
 -- create floor shape only for the looks
-local bar2 = spriteSheet:grabSprite("bar2.png", true) 
-bar2.x = 160; bar2.y = 440
+local bar2 = display.newImage( myImageSheet , sheetInfo:getFrameIndex("bar2") )
+bar2.x = display.contentCenterX
+bar2.y = display.contentHeight - display.screenOriginY
+bar2.anchorY = 1
 
 -- load the physics data, scale factor is set to 1.0
-local physicsData = (require "shapedefs").physicsData(1.0)
+local physicsData = require("shapedefs").physicsData(1.0)
 
 -- physics.setDrawMode( "hybrid" )
 
-function newItem()	
-	names = {"orange", "drink", "hamburger", "hotdog", "icecream", "icecream2", "icecream3"};
+local function newItem()
+	names = {"orange", "drink", "hamburger", "hotdog", "icecream", "icecream2", "icecream3"}
 
-	name = names[math.random(6)];
+	name = names[math.random(#names)]
 
-	-- set the graphics 
-	obj = spriteSheet:grabSprite(name..".png", true);
+	-- set the graphics
+	obj = display.newImage( myImageSheet , sheetInfo:getFrameIndex(name) )
 
 	-- set the shape
-	physics.addBody( obj, physicsData:get(name))	
-	
+	physics.addBody( obj, physicsData:get(name))
+
 	-- random start location
-	obj.x = 60 + math.random( 160 )
-	obj.y = -100
+	obj.x = 60 + math.random( display.contentWidth - 60 )
+	obj.y = display.screenOriginY-100
 end
 
-local dropCrates = timer.performWithDelay( 500, newItem, 100 )
+timer.performWithDelay( 500, newItem, 100 )
