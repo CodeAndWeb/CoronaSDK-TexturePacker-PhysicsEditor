@@ -49,7 +49,7 @@ local function newItem()
 	physics.addBody( obj, physicsData:get(name))
 
 	-- random start location
-	obj.x = 60 + math.random( display.contentWidth - 60 )
+	obj.x = math.random( 60, display.contentWidth-60 )
 	obj.y = display.screenOriginY-100
 end
 
